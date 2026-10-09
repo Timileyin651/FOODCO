@@ -1,0 +1,21 @@
+<%
+  const nav = [
+    { key: 'pastries', label: 'Pastries' },
+    { key: 'bakery',   label: 'Bakery'   },
+    { key: 'snacks',   label: 'Snacks'   },
+    { key: 'audit',    label: 'Audit'    }
+  ];
+%>
+<aside class="side">
+  <nav aria-label="Modules">
+    <ul class="nav">
+      <% nav.forEach(n => { %>
+
+      <% }) %>
+    </ul>
+  </nav>
+  <form method="post" action="/logout" class="side-foot">
+    <input type="hidden" name="_csrf" value="<%= locals.csrfToken || '' %>" />
+    <button class="nav-link" type="submit"><svg class="ico"><use href="#i-logout"/></svg><span>Log out</span></button>
+  </form>
+</aside>

@@ -1,0 +1,145 @@
+:root{
+  --green:#0a6925; --green-d:#064a19; --walnut:#0a1a11; --walnut-2:#16351f;
+  --amber:#ffb54a; --ember:#ff8a3d;
+  --steel-1:#e7eaed; --steel-2:#9aa1a8; --steel-3:#596067;
+  --ink:#f3f8ef; --ink-dim:#bfd3c2;
+  --ok:#5fdc7f; --out:#ff7a6b;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;color:var(--ink);font:400 1rem/1.55 var(--body);
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0,rgba(255,181,74,.16),transparent 70%),
+    linear-gradient(180deg,#10291a,var(--walnut) 60%);
+  min-height:100vh;
+}
+.wrap{width:min(1120px,100% - 32px);margin-inline:auto}
+
+/* Header canopy with logo */
+.canopy{
+  background:linear-gradient(180deg,#0d7a2b,var(--green) 55%,var(--green-d));
+  border-bottom:3px solid var(--steel-2);
+  box-shadow:0 10px 30px rgba(255,181,74,.16),inset 0 1px 0 rgba(255,255,255,.25);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:14px}
+.logo{display:block;line-height:0}
+.logo img{height:clamp(44px,8vw,64px);width:auto;filter:drop-shadow(0 2px 0 rgba(0,36,10,.55))}
+.legend{display:flex;gap:18px;margin:0;padding:0;list-style:none;font-size:.9rem;color:var(--ink-dim)}
+.legend li{display:flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.dot.out{background:var(--out);box-shadow:0 0 8px var(--out)}
+
+.intro{padding-block:40px 28px;max-width:640px;margin-inline:0}
+.intro h1{font:800 clamp(2rem,5vw,3.2rem)/1.05 var(--display);margin:0 0 10px;letter-spacing:-.02em}
+.intro p{margin:0;color:var(--ink-dim);max-width:52ch}
+
+/* The case: steel frame, curved glass front, warm interior */
+.case{
+  padding:14px;border-radius:44px 44px 10px 10px;
+  background:linear-gradient(135deg,var(--steel-1),var(--steel-2) 40%,var(--steel-3) 70%,var(--steel-2));
+  box-shadow:0 30px 60px rgba(0,0,0,.55),inset 0 2px 0 rgba(255,255,255,.7);
+}
+.glass{
+  position:relative;overflow:hidden;
+  padding:8px clamp(12px,3vw,32px) 24px;
+  border-radius:32px 32px 4px 4px;
+  background:linear-gradient(180deg,var(--walnut-2),#0a1a10);
+  box-shadow:inset 0 0 40px rgba(0,0,0,.7),inset 0 0 0 2px rgba(0,0,0,.5);
+}
+/* static glass reflection on the left edge */
+.glass::after{
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+  background:linear-gradient(100deg,rgba(255,255,255,.12),rgba(255,255,255,0) 16%,rgba(255,255,255,0) 84%,rgba(255,255,255,.06));
+}
+/* slow warm sweep across the glass */
+.glass::before{
+  content:"";position:absolute;top:-10%;bottom:-10%;left:0;width:28%;z-index:2;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,214,150,.10),transparent);
+  transform:translateX(-120%) skewX(-18deg);
+  animation:sweep 11s ease-in-out infinite;
+}
+@keyframes sweep{0%,55%{transform:translateX(-120%) skewX(-18deg)}100%{transform:translateX(480%) skewX(-18deg)}}
+
+/* Shelves */
+.shelf{
+  position:relative;padding:34px 0 0;margin-top:6px;
+  background:radial-gradient(ellipse 70% 100% at 50% 0,rgba(255,181,74,.22),transparent 72%);
+}
+.shelf::before{ /* heat lamp strip */
+  content:"";position:absolute;top:10px;left:5%;right:5%;height:6px;border-radius:6px;
+  background:linear-gradient(90deg,var(--ember),var(--amber),var(--ember));
+  box-shadow:0 0 26px 8px rgba(255,181,74,.45);
+  animation:warm 6s ease-in-out infinite;
+}
+@keyframes warm{50%{opacity:.82}}
+.plate{
+  display:inline-block;margin:6px 0 14px;padding:5px 16px;border-radius:6px;
+  font:700 1.05rem/1.3 var(--display);color:#fff;
+  background:linear-gradient(180deg,#14862f,var(--green));
+  border:2px solid var(--steel-1);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 3px 8px rgba(0,0,0,.45);
+}
+.grid{
+  list-style:none;margin:0;padding:0;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr));
+  gap:14px;
+}
+.rail{
+  height:14px;margin-top:16px;border-radius:3px;
+  background:linear-gradient(180deg,var(--steel-1),var(--steel-2) 45%,var(--steel-3));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 12px 18px rgba(0,0,0,.55);
+}
+
+/* Product cards */
+.card{
+  position:relative;display:flex;flex-direction:column;
+  padding:12px 12px 14px;border-radius:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.14);
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+.card:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 14px 26px rgba(0,0,0,.45),0 0 24px rgba(255,181,74,.2)}
+.art{
+  position:relative;aspect-ratio:5/4;display:grid;place-items:center;border-radius:10px;
+  background:radial-gradient(circle at 50% 58%,rgba(255,181,74,.3),transparent 70%);
+}
+.art img{display:block;width:86%;height:auto;filter:drop-shadow(0 6px 6px rgba(0,0,0,.45))}
+.card h3{font:700 1.02rem/1.25 var(--display);margin:10px 0 6px}
+.status{margin:auto 0 0;display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--ink-dim)}
+.status .dot{width:8px;height:8px;flex:none}
+
+/* Not available: dim overlay + badge */
+.card[data-status="out"] .art img{filter:grayscale(.85) brightness(.55)}
+.card[data-status="out"] .art::before{content:"";position:absolute;inset:0;border-radius:10px;background:rgba(12,8,5,.55)}
+.card[data-status="out"]:hover{transform:none;box-shadow:none}
+.badge{
+  position:absolute;left:50%;top:50%;translate:-50% -50%;white-space:nowrap;
+  padding:4px 12px;border-radius:999px;font-size:.8rem;font-weight:600;
+  color:#ffd9d3;background:rgba(30,12,10,.92);border:1px solid var(--out);
+}
+
+/* Case base + footer */
+.base{height:22px;margin:0 28px;border-radius:0 0 10px 10px;background:linear-gradient(180deg,var(--steel-3),#2a2e32)}
+footer{padding:28px 0 40px;text-align:center;color:var(--ink-dim);font-size:.9rem}
+
+/* Scroll reveal (only when JS is on; short durations) */
+.js .reveal{opacity:0;translate:0 14px;
+  transition:opacity .3s ease calc(var(--i,0)*60ms),translate .3s ease calc(var(--i,0)*60ms),transform .2s ease,box-shadow .2s ease}
+.js .reveal.in{opacity:1;translate:none}
+/* Failsafe: if script.js never loads, reveal everything after 2s instead of staying hidden */
+.js:not(.ready) .reveal{animation:reveal-failsafe 0s 2s forwards}
+@keyframes reveal-failsafe{to{opacity:1;translate:none}}
+
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .js .reveal{opacity:1;translate:none}
+}
+@media (max-width:520px){
+  .case{border-radius:30px 30px 8px 8px;padding:10px}
+  .glass{border-radius:22px 22px 4px 4px}
+  .legend{gap:12px}
+}

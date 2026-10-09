@@ -1,0 +1,64 @@
+
+<%- include('../partials/head') %>
+<header class="canopy">
+  <div class="wrap bar">
+    <a class="logo" href="/dashboard/pastries"><img src="/images/foodco-logo.svg" alt="FoodCo" width="196" height="64" /></a>
+    
+  </div>
+</header>
+
+<div class="wrap shell">
+  <%- include('../partials/sidebar') %>
+
+
+    <div class="case"><div class="glass">
+      <div class="panel-head">
+        <h1 class="plate"><%= titles[module] %></h1>
+        <% if (!isAudit) { %>
+          <a class="btn btn-amber" href="/dashboard/<%= module %>/new"><svg class="ico"><use href="#i-plus"/></svg>Add entry</a>
+        <% } %>
+      </div>
+
+      <% if (!items.length) { %>
+        <p class="empty"><%= isAudit ? 'No activity recorded yet.' : 'Nothing here yet. Add your first entry.' %></p>
+      <% } else if (isAudit) { %>
+        <div class="table-wrap"><table class="table">
+          <thead><tr><th>When</th><th>User</th><th>Action</th><th>Item</th></tr></thead>
+          <tbody>
+            <% items.forEach(a => { %>
+              <tr>
+                <td><time datetime="<%= new Date(a.at).toISOString() %>"><%= new Date(a.at).toLocaleString() %></time></td>
+                <td><%= a.user %></td><td><%= a.action %></td><td><%= a.target %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table></div>
+      <% } else { %>
+        <div class="table-wrap"><table class="table">
+          <thead><tr><th>Item</th><th>Price</th><th>In stock</th><th>Status</th><th class="end"><span class="sr">Actions</span></th></tr></thead>
+          <tbody>
+            <% items.forEach(p => { %>
+              <tr<%- p.status === 'out' ? ' class="is-out"' : '' %>>
+                <td><span class="item"><% if (p.image) { %><img src="<%= p.image %>" alt="" width="40" height="32" /><% } %><strong><%= p.name %></strong></span></td>
+                <td><%= Number(p.price).toFixed(2) %></td>
+                <td><%= p.qty %></td>
+                <td><span class="status"><i class="dot<%= p.status === 'out' ? ' out' : '' %>"></i><%= p.status === 'out' ? 'Not available' : 'Available' %></span></td>
+                <td class="end">
+                  <span class="actions">
+                    <a class="icon-btn edit" href="/dashboard/<%= module %>/<%= p.id %>/edit" aria-label="Edit <%= p.name %>" title="Edit"><svg class="ico"><use href="#i-edit"/></svg></a>
+                    <form method="post" action="/dashboard/<%= module %>/<%= p.id %>/delete" data-confirm="Delete <%= p.name %>? This can't be undone.">
+                      <input type="hidden" name="_csrf" value="<%= locals.csrfToken || '' %>" />
+                      <button class="icon-btn del" type="submit" aria-label="Delete <%= p.name %>" title="Delete"><svg class="ico"><use href="#i-trash"/></svg></button>
+                    </form>
+                  </span>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table></div>
+      <% } %>
+    </div></div>
+    <div class="base" aria-hidden="true"></div>
+  </main> -->
+</div>
+<%- include('../partials/foot', { script: '/js/dashboard.js' }) %>
