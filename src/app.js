@@ -30,7 +30,7 @@ require('./middleware/auth')
 db.connectToMongoDB();
 
 const PORT = process.env.PORT
-const HOST = process.env.HOST || 'localhost';
+const HOST = '0.0.0.0';
 
 // Configure EJS
 app.set('view engine', 'ejs');
