@@ -1,0 +1,16 @@
+<%- include('../../partials/head', { title: 'Pastries' }) %>
+<%- include('../../partials/header') %>
+
+<div class="wrap shell">
+  <%- include('../../partials/sidebar', { active: '/dashboard/pastries' }) %>
+  <main class="panel">
+    <div class="case">
+      <div class="glass">
+        <%- include('list-body', { mod: mod, items: items, q: q, page: page, pages: pages, total: total }) %>
+      </div>
+    </div>
+    <div class="base" aria-hidden="true"></div>
+  </main>
+</div>
+
+<%- include('../../partials/foot') %>

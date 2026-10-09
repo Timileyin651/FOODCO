@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const { type } = require('node:os');
 
 const userSchema = new mongoose.Schema({
     first_name: {
@@ -28,11 +27,19 @@ const userSchema = new mongoose.Schema({
     password:{
         type: String,
         required: [true, 'Password is required'],
-        trim:true,
+        trim:true
+    },
+    // Additive: the dashboard audit log and session store keep the role.
+    role:{
+        type: String,
+        enum: ['admin', 'staff'],
+        default: 'admin'
     }
 },{timestamps: true})
 
-userSchema.pre('save', async function () {
+// NOTE: `next` was missing from the signature, so saving a user without a
+// password change threw ReferenceError. Same hashing behaviour, minus the bug.
+userSchema.pre('save', async function (next) {
     if(!this.isModified('password')) return next();
     this.password = await bcrypt.hash(this.password, 10)
 })

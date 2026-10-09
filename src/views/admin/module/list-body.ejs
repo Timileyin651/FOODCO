@@ -1,0 +1,120 @@
+<div class="panel-head">
+  <h1 class="plate"><%= mod.heading %></h1>
+  <div class="head-actions">
+    <form class="search" method="get" action="/dashboard/<%= mod.path %>" role="search">
+      <label class="sr" for="q-<%= mod.key %>">Search <%= mod.heading.toLowerCase() %> by name</label>
+      <svg class="ico" aria-hidden="true"><use href="#i-search"></use></svg>
+      <input
+        id="q-<%= mod.key %>"
+        type="search"
+        name="q"
+        placeholder="Search by name"
+        value="<%= locals.q ? q : '' %>"
+      />
+      <button class="btn btn-small" type="submit">Search</button>
+    </form>
+    <a class="btn btn-amber" href="/dashboard/<%= mod.path %>/new">
+      <svg class="ico" aria-hidden="true"><use href="#i-plus"></use></svg>
+      Add entry
+    </a>
+  </div>
+</div>
+
+<%- include('../../partials/flash') %>
+
+<% const rows = locals.items || []; %>
+<% if (!rows.length) { %>
+<p class="empty">
+  <% if (locals.q) { %>
+  No <%= mod.heading.toLowerCase() %> matches &ldquo;<%= q %>&rdquo;.
+  <a class="link" href="/dashboard/<%= mod.path %>">Clear the search</a>
+  <% } else { %>
+  The case is empty. Use <strong>Add entry</strong> to put the first
+  <%= mod.singular.toLowerCase() %> on the shelf.
+  <% } %>
+</p>
+<% } else { %>
+<div class="table-wrap">
+  <table class="table">
+    <caption class="sr">
+      <%= mod.heading %>: item, price, quantity, status and actions
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">Item</th>
+        <th scope="col" class="num">Price</th>
+        <th scope="col" class="num">Quantity</th>
+        <th scope="col">Status</th>
+        <th scope="col" class="end">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% rows.forEach(function (entry) { %>
+      <tr class="<%= entry.status === 'out' ? 'is-out' : '' %>">
+        <td>
+          <span class="item">
+            <% const src = locals.imgSrc ? imgSrc(entry.image) : ''; %>
+            <% if (src) { %>
+            <img src="<%= src %>" alt="" width="40" height="32" loading="lazy" />
+            <% } else { %>
+            <span class="thumb placeholder" aria-hidden="true">
+              <svg class="ico"><use href="#<%= mod.key === 'bakery' ? 'i-loaf' : mod.key === 'pastries' ? 'i-pastry' : 'i-snack' %>"></use></svg>
+            </span>
+            <% } %>
+            <strong><%= entry.name %></strong>
+          </span>
+        </td>
+        <td class="num">&#8358;<%= Number(entry.price).toFixed(2) %></td>
+        <td class="num"><%= entry.quantity %></td>
+        <td>
+          <span class="status">
+            <i class="dot<%= entry.status === 'out' ? ' out' : '' %>"></i>
+            <%= entry.status === 'in' ? 'Available' : 'Not available' %>
+          </span>
+        </td>
+        <td class="end">
+          <span class="actions">
+            <a
+              class="icon-btn edit"
+              href="/dashboard/<%= mod.path %>/<%= entry._id %>/edit"
+              title="Edit <%= entry.name %>"
+              aria-label="Edit <%= entry.name %>"
+              ><svg class="ico" aria-hidden="true"><use href="#i-pencil"></use></svg
+            ></a>
+            <form
+              method="post"
+              action="/dashboard/<%= mod.path %>/<%= entry._id %>/delete"
+              data-confirm="Delete &ldquo;<%= entry.name %>&rdquo;? This cannot be undone."
+            >
+              <input type="hidden" name="_csrf" value="<%= locals.csrfToken || '' %>" />
+              <button
+                class="icon-btn del"
+                type="submit"
+                title="Delete <%= entry.name %>"
+                aria-label="Delete <%= entry.name %>"
+              >
+                <svg class="ico" aria-hidden="true"><use href="#i-bin"></use></svg>
+              </button>
+            </form>
+          </span>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
+
+<% const pages = locals.pages || 1; const current = locals.page || 1;
+   const queryString = locals.q ? '&q=' + encodeURIComponent(q) : ''; %>
+<% if (pages > 1) { %>
+<nav class="pager" aria-label="Pagination">
+  <% if (current > 1) { %>
+  <a class="btn btn-small" href="/dashboard/<%= mod.path %>?page=<%= current - 1 %><%= queryString %>">Previous</a>
+  <% } %>
+  <span>Page <%= current %> of <%= pages %></span>
+  <% if (current < pages) { %>
+  <a class="btn btn-small" href="/dashboard/<%= mod.path %>?page=<%= current + 1 %><%= queryString %>">Next</a>
+  <% } %>
+</nav>
+<% } %>
+<% } %>

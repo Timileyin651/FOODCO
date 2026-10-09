@@ -50,7 +50,17 @@ authRouter.post('/login', async(req,res,next)=>{
                         sameSite: 'lax'
                     });
 
-                    return res.redirect('/dashboard')
+                    // The dashboard now runs on a server session instead of
+                    // the JWT cookie, so start one here too and send the
+                    // browser to the default dashboard page.
+                    req.session.user = {
+                        _id: user._id,
+                        name: [user.first_name, user.last_name].filter(Boolean).join(' ') || user.username || user.email,
+                        email: user.email,
+                        role: user.role || 'admin'
+                    };
+
+                    return res.redirect('/dashboard/pastries')
                 }
             )
         } catch (error) {

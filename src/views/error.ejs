@@ -1,0 +1,22 @@
+<%- include('partials/head', { title: locals.status === 404 ? 'Page not found' : 'Something went wrong' }) %>
+<%- include('partials/header') %>
+
+<main class="wrap auth-main">
+  <div class="case">
+    <div class="glass auth-card">
+      <h1 class="plate"><%= locals.status === 404 ? 'Not found' : 'Something went wrong' %></h1>
+      <p class="lede">
+        <%= locals.status === 404
+          ? 'That page is not part of the FoodCo case.'
+          : (locals.message || 'An unexpected error happened. Please try again.') %>
+      </p>
+      <a class="btn" href="<%= locals.user ? '/dashboard/pastries' : '/login' %>">
+        <svg class="ico" aria-hidden="true"><use href="#i-back"></use></svg>
+        <%= locals.user ? 'Back to the dashboard' : 'Back to log in' %>
+      </a>
+    </div>
+  </div>
+  <div class="base" aria-hidden="true"></div>
+</main>
+
+<%- include('partials/foot') %>

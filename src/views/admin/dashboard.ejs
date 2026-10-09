@@ -1,64 +1,87 @@
-
-<%- include('../partials/head') %>
-<header class="canopy">
-  <div class="wrap bar">
-    <a class="logo" href="/dashboard/pastries"><img src="/images/foodco-logo.svg" alt="FoodCo" width="196" height="64" /></a>
-    
-  </div>
-</header>
+<%- include('../partials/head', { title: 'Dashboard' }) %>
+<%- include('../partials/header') %>
 
 <div class="wrap shell">
-  <%- include('../partials/sidebar') %>
+  <%- include('../partials/sidebar', { active: '/dashboard' }) %>
 
+  <main class="panel">
+    <div class="case">
+      <div class="glass">
+        <div class="panel-head">
+          <h1 class="plate">Overview</h1>
+        </div>
 
-    <div class="case"><div class="glass">
-      <div class="panel-head">
-        <h1 class="plate"><%= titles[module] %></h1>
-        <% if (!isAudit) { %>
-          <a class="btn btn-amber" href="/dashboard/<%= module %>/new"><svg class="ico"><use href="#i-plus"/></svg>Add entry</a>
+        <%- include('../partials/flash') %>
+
+        <p class="lede">
+          Welcome back<%= locals.user ? ', ' + user.name : '' %>. Pick a
+          section on the left to manage what is in the case.
+        </p>
+
+        <ul class="grid stats">
+          <li class="card">
+            <a href="/dashboard/bakery">
+              <svg class="ico big" aria-hidden="true"><use href="#i-loaf"></use></svg>
+              <h2>Bakery</h2>
+              <p class="count"><%= locals.counts ? counts.bakery : 0 %></p>
+              <p class="hint">items in the case</p>
+            </a>
+          </li>
+          <li class="card">
+            <a href="/dashboard/pastries">
+              <svg class="ico big" aria-hidden="true"><use href="#i-pastry"></use></svg>
+              <h2>Pastries</h2>
+              <p class="count"><%= locals.counts ? counts.pastries : 0 %></p>
+              <p class="hint">items in the case</p>
+            </a>
+          </li>
+          <li class="card">
+            <a href="/dashboard/snacks">
+              <svg class="ico big" aria-hidden="true"><use href="#i-snack"></use></svg>
+              <h2>Snacks</h2>
+              <p class="count"><%= locals.counts ? counts.snacks : 0 %></p>
+              <p class="hint">items in the case</p>
+            </a>
+          </li>
+          <li class="card">
+            <a href="/dashboard/audit">
+              <svg class="ico big" aria-hidden="true"><use href="#i-clipboard"></use></svg>
+              <h2>Audit</h2>
+              <p class="count">&mdash;</p>
+              <p class="hint">every change, newest first</p>
+            </a>
+          </li>
+        </ul>
+
+        <h2 class="plate sub">Latest activity</h2>
+        <% if (locals.recent && recent.length) { %>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">When</th>
+                <th scope="col">User</th>
+                <th scope="col">Summary</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% recent.forEach(function (entry) { %>
+              <tr>
+                <td class="nowrap"><%= new Date(entry.createdAt).toLocaleString() %></td>
+                <td><%= entry.userLabel %></td>
+                <td><%= entry.summary %></td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+        <% } else { %>
+        <p class="empty">Nothing has been recorded yet.</p>
         <% } %>
       </div>
-
-      <% if (!items.length) { %>
-        <p class="empty"><%= isAudit ? 'No activity recorded yet.' : 'Nothing here yet. Add your first entry.' %></p>
-      <% } else if (isAudit) { %>
-        <div class="table-wrap"><table class="table">
-          <thead><tr><th>When</th><th>User</th><th>Action</th><th>Item</th></tr></thead>
-          <tbody>
-            <% items.forEach(a => { %>
-              <tr>
-                <td><time datetime="<%= new Date(a.at).toISOString() %>"><%= new Date(a.at).toLocaleString() %></time></td>
-                <td><%= a.user %></td><td><%= a.action %></td><td><%= a.target %></td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table></div>
-      <% } else { %>
-        <div class="table-wrap"><table class="table">
-          <thead><tr><th>Item</th><th>Price</th><th>In stock</th><th>Status</th><th class="end"><span class="sr">Actions</span></th></tr></thead>
-          <tbody>
-            <% items.forEach(p => { %>
-              <tr<%- p.status === 'out' ? ' class="is-out"' : '' %>>
-                <td><span class="item"><% if (p.image) { %><img src="<%= p.image %>" alt="" width="40" height="32" /><% } %><strong><%= p.name %></strong></span></td>
-                <td><%= Number(p.price).toFixed(2) %></td>
-                <td><%= p.qty %></td>
-                <td><span class="status"><i class="dot<%= p.status === 'out' ? ' out' : '' %>"></i><%= p.status === 'out' ? 'Not available' : 'Available' %></span></td>
-                <td class="end">
-                  <span class="actions">
-                    <a class="icon-btn edit" href="/dashboard/<%= module %>/<%= p.id %>/edit" aria-label="Edit <%= p.name %>" title="Edit"><svg class="ico"><use href="#i-edit"/></svg></a>
-                    <form method="post" action="/dashboard/<%= module %>/<%= p.id %>/delete" data-confirm="Delete <%= p.name %>? This can't be undone.">
-                      <input type="hidden" name="_csrf" value="<%= locals.csrfToken || '' %>" />
-                      <button class="icon-btn del" type="submit" aria-label="Delete <%= p.name %>" title="Delete"><svg class="ico"><use href="#i-trash"/></svg></button>
-                    </form>
-                  </span>
-                </td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table></div>
-      <% } %>
-    </div></div>
+    </div>
     <div class="base" aria-hidden="true"></div>
-  </main> -->
+  </main>
 </div>
-<%- include('../partials/foot', { script: '/js/dashboard.js' }) %>
+
+<%- include('../partials/foot') %>

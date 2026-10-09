@@ -1,0 +1,144 @@
+<%- include('../../partials/head', { title: locals.title || 'Entry form' }) %>
+<%- include('../../partials/header') %>
+
+<div class="wrap shell">
+  <%- include('../../partials/sidebar', { active: '/dashboard/' + mod.path }) %>
+  <main class="panel">
+    <div class="case">
+      <div class="glass form-card">
+        <div class="panel-head">
+          <h1 class="plate">
+            <%= locals.item ? 'Edit ' + mod.singular.toLowerCase() : 'Add to ' + mod.heading %>
+          </h1>
+          <a class="btn btn-small" href="/dashboard/<%= mod.path %>">
+            <svg class="ico" aria-hidden="true"><use href="#i-back"></use></svg>
+            Back to <%= mod.heading.toLowerCase() %>
+          </a>
+        </div>
+
+        <%- include('../../partials/flash') %>
+
+        <% if (locals.formError) { %>
+        <p class="alert err" role="alert"><%= formError %></p>
+        <% } %>
+
+        <form class="form" method="post" action="<%= formAction %>" novalidate>
+          <input type="hidden" name="_csrf" value="<%= locals.csrfToken || '' %>" />
+
+          <label for="f-name">Name</label>
+          <input
+            id="f-name"
+            name="name"
+            type="text"
+            maxlength="80"
+            required
+            placeholder="e.g. Butter croissant"
+            value="<%= locals.values ? values.name : '' %>"
+            <% if (locals.errors && errors.name) { %>aria-invalid="true" aria-describedby="name-error"<% } %>
+          />
+          <% if (locals.errors && errors.name) { %>
+          <p class="field-err" id="name-error"><%= errors.name %></p>
+          <% } %>
+
+          <div class="row">
+            <div>
+              <label for="f-price">Price (&#8358;)</label>
+              <input
+                id="f-price"
+                name="price"
+                type="number"
+                min="0"
+                step="0.01"
+                required
+                placeholder="0.00"
+                value="<%= locals.values && values.price !== '' ? values.price : '' %>"
+                <% if (locals.errors && errors.price) { %>aria-invalid="true" aria-describedby="price-error"<% } %>
+              />
+              <% if (locals.errors && errors.price) { %>
+              <p class="field-err" id="price-error"><%= errors.price %></p>
+              <% } %>
+            </div>
+            <div>
+              <label for="f-quantity">Quantity</label>
+              <input
+                id="f-quantity"
+                name="quantity"
+                type="number"
+                min="0"
+                step="1"
+                required
+                placeholder="0"
+                value="<%= locals.values && values.quantity !== '' ? values.quantity : '' %>"
+                <% if (locals.errors && errors.quantity) { %>aria-invalid="true" aria-describedby="quantity-error"<% } %>
+              />
+              <% if (locals.errors && errors.quantity) { %>
+              <p class="field-err" id="quantity-error"><%= errors.quantity %></p>
+              <% } %>
+            </div>
+          </div>
+
+          <label for="f-status">Status</label>
+          <select
+            id="f-status"
+            name="status"
+            required
+            <% if (locals.errors && errors.status) { %>aria-invalid="true" aria-describedby="status-error"<% } %>
+          >
+            <option value="in" <%= locals.values && values.status === 'in' ? 'selected' : '' %>>Available</option>
+            <option value="out" <%= locals.values && values.status === 'out' ? 'selected' : '' %>>Not available</option>
+          </select>
+          <% if (locals.errors && errors.status) { %>
+          <p class="field-err" id="status-error"><%= errors.status %></p>
+          <% } %>
+
+          <% const chosenImage = locals.values && values.image ? String(values.image).replace(/^.*\//, '') : ''; %>
+          <label for="f-image">Image (optional)</label>
+          <div class="image-picker">
+            <select
+              id="f-image"
+              name="image"
+              aria-describedby="image-hint"
+              <% if (locals.errors && errors.image) { %>aria-invalid="true" aria-describedby="image-error"<% } %>
+            >
+              <option value="">No image</option>
+              <% (locals.images || []).forEach(function (filename) { %>
+              <option
+                value="<%= filename %>"
+                <%= chosenImage === filename ? 'selected' : '' %>
+              ><%= filename %></option>
+              <% }) %>
+            </select>
+            <span class="thumb-preview">
+              <% const previewSrc = chosenImage
+                ? (chosenImage.indexOf('/') === 0 || /^https?:\/\//.test(chosenImage)
+                    ? chosenImage
+                    : '/images/products/' + chosenImage)
+                : ''; %>
+              <img
+                id="image-preview"
+                alt="Preview of the selected image"
+                width="72"
+                height="58"
+                <% if (!previewSrc) { %>hidden<% } else { %>src="<%= previewSrc %>"<% } %>
+              />
+            </span>
+          </div>
+          <p class="hint" id="image-hint">
+            Choose a picture from the product images folder. It is shown on the
+            shop homepage and in the list here.
+          </p>
+          <% if (locals.errors && errors.image) { %>
+          <p class="field-err" id="image-error"><%= errors.image %></p>
+          <% } %>
+
+          <button class="btn btn-amber" type="submit">
+            <%= locals.item ? 'Save changes' : 'Add entry' %>
+          </button>
+        </form>
+      </div>
+    </div>
+    <div class="base" aria-hidden="true"></div>
+  </main>
+</div>
+
+<%- include('../../partials/foot') %>

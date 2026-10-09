@@ -1,0 +1,17 @@
+<header class="canopy">
+  <div class="wrap bar">
+    <a class="logo" href="/" aria-label="FoodCo home"
+      ><img
+        src="/images/foodco-logo.svg"
+        alt="FoodCo"
+        width="196"
+        height="64"
+    /></a>
+    <% if (locals.user) { %>
+    <p class="who">
+      <svg class="ico" aria-hidden="true"><use href="#i-user"></use></svg>
+      Signed in as <strong><%= user.name %></strong>
+    </p>
+    <% } %>
+  </div>
+</header>

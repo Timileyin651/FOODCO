@@ -1,0 +1,65 @@
+<%- include('../../partials/head', { title: 'Audit log' }) %>
+<%- include('../../partials/header') %>
+
+<div class="wrap shell">
+  <%- include('../../partials/sidebar', { active: '/dashboard/audit' }) %>
+  <main class="panel">
+    <div class="case">
+      <div class="glass">
+        <div class="panel-head">
+          <h1 class="plate">Audit</h1>
+          <p class="count-note"><%= locals.total || 0 %> entries</p>
+        </div>
+
+        <%- include('../../partials/flash') %>
+
+        <% const rows = locals.entries || []; %>
+        <% if (!rows.length) { %>
+        <p class="empty">Nothing has been recorded yet.</p>
+        <% } else { %>
+        <div class="table-wrap">
+          <table class="table">
+            <caption class="sr">Audit trail, newest first</caption>
+            <thead>
+              <tr>
+                <th scope="col">When</th>
+                <th scope="col">User</th>
+                <th scope="col">Action</th>
+                <th scope="col">Module</th>
+                <th scope="col">Summary</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% rows.forEach(function (entry) { %>
+              <tr>
+                <td class="nowrap"><%= new Date(entry.createdAt).toLocaleString() %></td>
+                <td><%= locals.userName ? userName(entry.user) : 'System' %></td>
+                <td><span class="tag tag-<%= entry.action %>"><%= entry.action.replace('_', ' ') %></span></td>
+                <td><%= entry.module %></td>
+                <td><%= entry.summary %></td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+
+        <% const pages = locals.pages || 1; const current = locals.page || 1; %>
+        <% if (pages > 1) { %>
+        <nav class="pager" aria-label="Pagination">
+          <% if (current > 1) { %>
+          <a class="btn btn-small" href="/dashboard/audit?page=<%= current - 1 %>">Previous</a>
+          <% } %>
+          <span>Page <%= current %> of <%= pages %></span>
+          <% if (current < pages) { %>
+          <a class="btn btn-small" href="/dashboard/audit?page=<%= current + 1 %>">Next</a>
+          <% } %>
+        </nav>
+        <% } %>
+        <% } %>
+      </div>
+    </div>
+    <div class="base" aria-hidden="true"></div>
+  </main>
+</div>
+
+<%- include('../../partials/foot') %>

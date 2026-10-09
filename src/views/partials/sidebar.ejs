@@ -1,21 +1,32 @@
-<%
-  const nav = [
-    { key: 'pastries', label: 'Pastries' },
-    { key: 'bakery',   label: 'Bakery'   },
-    { key: 'snacks',   label: 'Snacks'   },
-    { key: 'audit',    label: 'Audit'    }
-  ];
-%>
+<% const navItems = [
+  { href: '/dashboard/bakery', label: 'Bakery', icon: 'i-loaf' },
+  { href: '/dashboard/pastries', label: 'Pastries', icon: 'i-pastry' },
+  { href: '/dashboard/snacks', label: 'Snacks', icon: 'i-snack' },
+  { href: '/dashboard/audit', label: 'Audit', icon: 'i-clipboard' },
+]; %>
 <aside class="side">
-  <nav aria-label="Modules">
+  <nav aria-label="Dashboard sections">
     <ul class="nav">
-      <% nav.forEach(n => { %>
-
-      <% }) %>
+      <% navItems.forEach(function (entry) { var isActive = locals.active === entry.href; %>
+      <li>
+        <a
+          class="nav-link<%= isActive ? ' is-active' : '' %>"
+          href="<%= entry.href %>"
+          <% if (isActive) { %>aria-current="page"<% } %>
+          ><svg class="ico" aria-hidden="true"><use href="#<%= entry.icon %>"></use></svg>
+          <span><%= entry.label %></span></a
+        >
+      </li>
+      <% }); %>
     </ul>
   </nav>
-  <form method="post" action="/logout" class="side-foot">
-    <input type="hidden" name="_csrf" value="<%= locals.csrfToken || '' %>" />
-    <button class="nav-link" type="submit"><svg class="ico"><use href="#i-logout"/></svg><span>Log out</span></button>
-  </form>
+  <div class="side-foot">
+    <form method="post" action="/logout" class="logout-form">
+      <input type="hidden" name="_csrf" value="<%= locals.csrfToken || '' %>" />
+      <button class="nav-link" type="submit">
+        <svg class="ico" aria-hidden="true"><use href="#i-logout"></use></svg>
+        <span>Log out</span>
+      </button>
+    </form>
+  </div>
 </aside>

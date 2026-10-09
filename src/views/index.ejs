@@ -17,18 +17,24 @@
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
   <body>
-    <% /* FoodCo bakery display template. Product images are served from
-    public/images/products/*.svg */ %>
+    <% /* FoodCo bakery display. The shelves are fed from the same Bakery,
+    Pastry and Snack collections the admin edits, so this page always shows
+    the current case. Product images live in public/images/products/*. */ %>
 
     <header class="canopy">
       <div class="wrap bar">
         <a class="logo" href="#top" aria-label="FoodCo home"
           ><img src="/images/foodco-logo.svg" alt="FoodCo" width="196" height="64"
         /></a>
-        <ul class="legend" aria-label="Availability key">
-          <li><i class="dot"></i>Available</li>
-          <li><i class="dot out"></i>Not available</li>
-        </ul>
+        <div class="bar-actions">
+          <ul class="legend" aria-label="Availability key">
+            <li><i class="dot"></i>Available</li>
+            <li><i class="dot out"></i>Not available</li>
+          </ul>
+          <a class="staff-link" href="<%= locals.user ? '/dashboard' : '/login' %>"
+            ><%= locals.user ? 'Dashboard' : 'Staff log in' %></a
+          >
+        </div>
       </div>
     </header>
 
@@ -42,233 +48,52 @@
     <main class="wrap">
       <div class="case">
         <div class="glass">
-          <!-- ===================== BAKERY ===================== -->
-          <section class="shelf" aria-labelledby="h-bakery">
-            <h2 class="plate reveal" id="h-bakery">Bakery</h2>
+          <% (locals.shelves || []).forEach(function (shelf) { %>
+          <section class="shelf" aria-labelledby="<%= shelf.id %>">
+            <h2 class="plate reveal" id="<%= shelf.id %>"><%= shelf.heading %></h2>
+
+            <% if (!shelf.items.length) { %>
+            <p class="empty-shelf">
+              Nothing on this shelf right now. Please check back for the next
+              batch.
+            </p>
+            <% } else { %>
             <ul class="grid">
+              <% shelf.items.forEach(function (item, index) {
+                   var palette = shelf.palettes[index % shelf.palettes.length];
+                   var src = locals.imgSrc ? imgSrc(item.image) : '';
+                   var isOut = item.status === 'out';
+              %>
               <li
                 class="card reveal"
-                style="--a: #d9a15a; --b: #9c5f26"
-                data-status="in"
+                style="--a: <%= palette.a %>; --b: <%= palette.b %><% if (palette.c) { %>; --c: <%= palette.c %><% } %>"
+                data-status="<%= item.status %>"
               >
                 <div class="art">
+                  <% if (src) { %>
                   <img
-                    src="/images/products/country-loaf.svg"
-                    alt="Country loaf"
+                    src="<%= src %>"
+                    alt="<%= item.name %>"
                     class="product-image"
                     loading="lazy"
                   />
-                </div>
-                <h3>Country loaf</h3>
-                <p class="status"><i class="dot"></i>Available</p>
-              </li>
-
-              <li
-                class="card reveal"
-                style="--a: #a8733f; --b: #6a3f1c"
-                data-status="in"
-              >
-                <div class="art">
-                  <img
-                    src="/images/products/whole-wheat-loaf.svg"
-                    alt="Whole wheat loaf"
-                    class="product-image"
-                    loading="lazy"
-                  />
-                </div>
-                <h3>Whole wheat loaf</h3>
-                <p class="status"><i class="dot"></i>Available</p>
-              </li>
-
-              <li
-                class="card reveal"
-                style="--a: #e3b066; --b: #a8692b"
-                data-status="out"
-              >
-                <div class="art">
-                  <img
-                    src="/images/products/baguette.svg"
-                    alt="Baguette"
-                    class="product-image"
-                    loading="lazy"
-                  />
+                  <% } %> <% if (isOut) { %>
                   <span class="badge" aria-hidden="true">Not available</span>
+                  <% } %>
                 </div>
-                <h3>Baguette</h3>
-                <p class="status"><i class="dot out"></i>Not available</p>
+                <h3><%= item.name %></h3>
+                <p class="status">
+                  <i class="dot<%= isOut ? ' out' : '' %>"></i>
+                  <%= isOut ? 'Not available' : 'Available' %>
+                </p>
               </li>
-
-              <li
-                class="card reveal"
-                style="--a: #d58a3c; --b: #9a5a1f"
-                data-status="in"
-              >
-                <div class="art">
-                  <img
-                    src="/images/products/sesame-bun.svg"
-                    alt="Sesame bun"
-                    class="product-image"
-                    loading="lazy"
-                  />
-                </div>
-                <h3>Sesame bun</h3>
-                <p class="status"><i class="dot"></i>Available</p>
-              </li>
+              <% }) %>
             </ul>
+            <% } %>
+
             <div class="rail"></div>
           </section>
-
-          <!-- ===================== PASTRIES ===================== -->
-          <section class="shelf" aria-labelledby="h-pastries">
-            <h2 class="plate reveal" id="h-pastries">Pastries</h2>
-            <ul class="grid">
-              <li
-                class="card reveal"
-                style="--a: #e9a845; --b: #b06a1c"
-                data-status="in"
-              >
-                <div class="art">
-                  <img
-                    src="/images/products/butter-croissant.svg"
-                    alt="Butter croissant"
-                    class="product-image"
-                    loading="lazy"
-                  />
-                </div>
-                <h3>Butter croissant</h3>
-                <p class="status"><i class="dot"></i>Available</p>
-              </li>
-
-              <li
-                class="card reveal"
-                style="--a: #d9a15a; --b: #f08cb4"
-                data-status="out"
-              >
-                <div class="art">
-                  <img
-                    src="/images/products/glazed-donut.svg"
-                    alt="Glazed donut"
-                    class="product-image"
-                    loading="lazy"
-                  />
-                  <span class="badge" aria-hidden="true">Not available</span>
-                </div>
-                <h3>Glazed donut</h3>
-                <p class="status"><i class="dot out"></i>Not available</p>
-              </li>
-
-              <li
-                class="card reveal"
-                style="--a: #8c6f9e; --b: #e7cfa6; --c: #3b3f8f"
-                data-status="in"
-              >
-                <div class="art">
-                  <img
-                    src="/images/products/blueberry-muffin.svg"
-                    alt="Blueberry muffin"
-                    class="product-image"
-                    loading="lazy"
-                  />
-                </div>
-                <h3>Blueberry muffin</h3>
-                <p class="status"><i class="dot"></i>Available</p>
-              </li>
-
-              <li
-                class="card reveal"
-                style="--a: #e0a24f; --b: #f08a3a; --c: #fff0c9"
-                data-status="in"
-              >
-                <div class="art">
-                  <img
-                    src="/images/products/apricot-danish.svg"
-                    alt="Apricot danish"
-                    class="product-image"
-                    loading="lazy"
-                  />
-                </div>
-                <h3>Apricot danish</h3>
-                <p class="status"><i class="dot"></i>Available</p>
-              </li>
-            </ul>
-            <div class="rail"></div>
-          </section>
-
-          <!-- ===================== SNACKS ===================== -->
-          <section class="shelf" aria-labelledby="h-snacks">
-            <h2 class="plate reveal" id="h-snacks">Snacks</h2>
-            <ul class="grid">
-              <li
-                class="card reveal"
-                style="--a: #d9a15a; --b: #a8662a; --c: #8c4a2f"
-                data-status="in"
-              >
-                <div class="art">
-                  <img
-                    src="/images/products/sausage-roll.svg"
-                    alt="Sausage roll"
-                    class="product-image"
-                    loading="lazy"
-                  />
-                </div>
-                <h3>Sausage roll</h3>
-                <p class="status"><i class="dot"></i>Available</p>
-              </li>
-
-              <li
-                class="card reveal"
-                style="--a: #d9983f; --b: #9d5d1b"
-                data-status="in"
-              >
-                <div class="art">
-                  <img
-                    src="/images/products/meat-pie.svg"
-                    alt="Meat pie"
-                    class="product-image"
-                    loading="lazy"
-                  />
-                </div>
-                <h3>Meat pie</h3>
-                <p class="status"><i class="dot"></i>Available</p>
-              </li>
-
-              <li
-                class="card reveal"
-                style="--a: #d6a04a; --b: #8f5a1c"
-                data-status="out"
-              >
-                <div class="art">
-                  <img
-                    src="/images/products/samosa.svg"
-                    alt="Samosa"
-                    class="product-image"
-                    loading="lazy"
-                  />
-                  <span class="badge" aria-hidden="true">Not available</span>
-                </div>
-                <h3>Samosa</h3>
-                <p class="status"><i class="dot out"></i>Not available</p>
-              </li>
-
-              <li
-                class="card reveal"
-                style="--a: #d9964a; --b: #f6d9a0"
-                data-status="in"
-              >
-                <div class="art">
-                  <img
-                    src="/images/products/puff-puff.svg"
-                    alt="Puff-puff"
-                    class="product-image"
-                    loading="lazy"
-                  />
-                </div>
-                <h3>Puff-puff</h3>
-                <p class="status"><i class="dot"></i>Available</p>
-              </li>
-            </ul>
-            <div class="rail"></div>
-          </section>
+          <% }) %>
         </div>
       </div>
       <div class="base" aria-hidden="true"></div>

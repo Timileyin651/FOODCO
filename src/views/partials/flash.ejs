@@ -1,0 +1,9 @@
+<% if (locals.flash && flash.length) { %>
+<div class="flashes">
+  <% flash.forEach(function (entry) { %>
+  <p class="alert <%= entry.type === 'success' ? 'ok' : 'err' %>" role="status">
+    <%= entry.text %>
+  </p>
+  <% }); %>
+</div>
+<% } %>
