@@ -44,6 +44,13 @@ function buildItemSchema() {
         trim: true,
         default: '',
       },
+      // Which branch this stock belongs to. Every dashboard query filters on it.
+      branch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branch',
+        required: [true, 'Branch is required'],
+        index: true,
+      },
     },
     { timestamps: true },
   );

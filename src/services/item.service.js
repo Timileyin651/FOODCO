@@ -6,12 +6,12 @@ function escapeRegex(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-/** Search by name (case-insensitive, literal) + pagination, 20 per page. */
-async function listItems(model, { q = '', page = 1 } = {}) {
+/** Search by name (case-insensitive, literal) + pagination, 20 per page.
+ *  `branch` scopes the query to one branch's stock. */
+async function listItems(model, { q = '', page = 1, branch = null } = {}) {
   const current = Math.max(1, parseInt(page, 10) || 1);
-  const filter = q
-    ? { name: { $regex: escapeRegex(q), $options: 'i' } }
-    : {};
+  const filter = branch ? { branch } : {};
+  if (q) filter.name = { $regex: escapeRegex(q), $options: 'i' };
 
   const [items, total] = await Promise.all([
     model

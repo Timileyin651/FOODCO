@@ -30,17 +30,23 @@ const userSchema = new mongoose.Schema({
         trim:true
     },
     // Additive: the dashboard audit log and session store keep the role.
+    // superadmin = can open every branch; admin/staff = only the branches below.
     role:{
         type: String,
-        enum: ['admin', 'staff'],
+        enum: ['superadmin', 'admin', 'staff'],
         default: 'admin'
-    }
+    },
+    branches:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branch',
+        default: [],
+    }]
 },{timestamps: true})
 
-// NOTE: `next` was missing from the signature, so saving a user without a
-// password change threw ReferenceError. Same hashing behaviour, minus the bug.
-userSchema.pre('save', async function (next) {
-    if(!this.isModified('password')) return next();
+// NOTE: kept async hashing, but an async pre-save hook cannot call `next`
+// (Mongoose passes no callback to async hooks), so it simply returns early.
+userSchema.pre('save', async function () {
+    if(!this.isModified('password')) return;
     this.password = await bcrypt.hash(this.password, 10)
 })
 

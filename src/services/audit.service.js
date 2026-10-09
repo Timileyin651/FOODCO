@@ -12,6 +12,7 @@ async function record(entry) {
       user,
       action: entry.action,
       module: entry.module || 'auth',
+      branch: entry.branch || null,
       targetId: entry.targetId || null,
       summary: entry.summary,
     });
@@ -20,17 +21,19 @@ async function record(entry) {
   }
 }
 
-/** Newest first, paginated, with the user's name resolved. */
-async function list({ page = 1, limit = 20 } = {}) {
+/** Newest first, paginated, with the user's name resolved.
+ *  Pass `branch` to see one branch's history only. */
+async function list({ page = 1, limit = 20, branch = null } = {}) {
   const current = Math.max(1, parseInt(page, 10) || 1);
   const safeLimit = Math.max(1, parseInt(limit, 10) || 20);
+  const filter = branch ? { branch } : {};
   const [entries, total] = await Promise.all([
-    AuditLog.find()
+    AuditLog.find(filter)
       .sort({ createdAt: -1, _id: -1 })
       .skip((current - 1) * safeLimit)
       .limit(safeLimit)
       .populate('user', 'first_name last_name username email'),
-    AuditLog.countDocuments(),
+    AuditLog.countDocuments(filter),
   ]);
 
   return {

@@ -1,7 +1,7 @@
 <div class="panel-head">
   <h1 class="plate"><%= mod.heading %></h1>
   <div class="head-actions">
-    <form class="search" method="get" action="/dashboard/<%= mod.path %>" role="search">
+    <form class="search" method="get" action="/dashboard/<%= branch.slug %>/<%= mod.path %>" role="search">
       <label class="sr" for="q-<%= mod.key %>">Search <%= mod.heading.toLowerCase() %> by name</label>
       <svg class="ico" aria-hidden="true"><use href="#i-search"></use></svg>
       <input
@@ -13,7 +13,7 @@
       />
       <button class="btn btn-small" type="submit">Search</button>
     </form>
-    <a class="btn btn-amber" href="/dashboard/<%= mod.path %>/new">
+    <a class="btn btn-amber" href="/dashboard/<%= branch.slug %>/<%= mod.path %>/new">
       <svg class="ico" aria-hidden="true"><use href="#i-plus"></use></svg>
       Add entry
     </a>
@@ -27,7 +27,7 @@
 <p class="empty">
   <% if (locals.q) { %>
   No <%= mod.heading.toLowerCase() %> matches &ldquo;<%= q %>&rdquo;.
-  <a class="link" href="/dashboard/<%= mod.path %>">Clear the search</a>
+  <a class="link" href="/dashboard/<%= branch.slug %>/<%= mod.path %>">Clear the search</a>
   <% } else { %>
   The case is empty. Use <strong>Add entry</strong> to put the first
   <%= mod.singular.toLowerCase() %> on the shelf.
@@ -76,14 +76,14 @@
           <span class="actions">
             <a
               class="icon-btn edit"
-              href="/dashboard/<%= mod.path %>/<%= entry._id %>/edit"
+              href="/dashboard/<%= branch.slug %>/<%= mod.path %>/<%= entry._id %>/edit"
               title="Edit <%= entry.name %>"
               aria-label="Edit <%= entry.name %>"
               ><svg class="ico" aria-hidden="true"><use href="#i-pencil"></use></svg
             ></a>
             <form
               method="post"
-              action="/dashboard/<%= mod.path %>/<%= entry._id %>/delete"
+              action="/dashboard/<%= branch.slug %>/<%= mod.path %>/<%= entry._id %>/delete"
               data-confirm="Delete &ldquo;<%= entry.name %>&rdquo;? This cannot be undone."
             >
               <input type="hidden" name="_csrf" value="<%= locals.csrfToken || '' %>" />
@@ -109,11 +109,11 @@
 <% if (pages > 1) { %>
 <nav class="pager" aria-label="Pagination">
   <% if (current > 1) { %>
-  <a class="btn btn-small" href="/dashboard/<%= mod.path %>?page=<%= current - 1 %><%= queryString %>">Previous</a>
+  <a class="btn btn-small" href="/dashboard/<%= branch.slug %>/<%= mod.path %>?page=<%= current - 1 %><%= queryString %>">Previous</a>
   <% } %>
   <span>Page <%= current %> of <%= pages %></span>
   <% if (current < pages) { %>
-  <a class="btn btn-small" href="/dashboard/<%= mod.path %>?page=<%= current + 1 %><%= queryString %>">Next</a>
+  <a class="btn btn-small" href="/dashboard/<%= branch.slug %>/<%= mod.path %>?page=<%= current + 1 %><%= queryString %>">Next</a>
   <% } %>
 </nav>
 <% } %>

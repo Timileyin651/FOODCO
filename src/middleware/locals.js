@@ -4,6 +4,8 @@
  */
 function locals(req, res, next) {
   res.locals.user = (req.session && req.session.user) || null;
+  res.locals.branches =
+    (req.session && req.session.user && req.session.user.branches) || [];
   res.locals.currentPath = req.path;
   res.locals.query = req.query;
   res.locals.imgSrc = function imgSrc(value) {

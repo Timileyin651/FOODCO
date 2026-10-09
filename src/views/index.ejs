@@ -31,6 +31,14 @@
             <li><i class="dot"></i>Available</li>
             <li><i class="dot out"></i>Not available</li>
           </ul>
+          <% if (locals.branches && branches.length) { %>
+          <label class="sr" for="city-switch">Choose your branch</label>
+          <select id="city-switch" class="city-switch">
+            <% branches.forEach(function (entry) { %>
+            <option value="<%= entry.slug %>" <%= locals.branch && branch.slug === entry.slug ? 'selected' : '' %>><%= entry.name %></option>
+            <% }) %>
+          </select>
+          <% } %>
           <a class="staff-link" href="<%= locals.user ? '/dashboard' : '/login' %>"
             ><%= locals.user ? 'Dashboard' : 'Staff log in' %></a
           >
@@ -39,15 +47,41 @@
     </header>
 
     <div id="top" class="wrap intro">
-      <h1>Fresh from the case</h1>
+      <% if (!locals.branch) { %>
+      <h1>Where are you?</h1>
       <p>
-        Everything here is baked today and kept warm. Dimmed items are sold out
-        until the next batch.
+        FoodCo has five branches. Pick yours to see what is fresh in the case
+        today.
       </p>
+      <% } else { %>
+      <h1><%= branch.name %></h1>
+      <p>
+        Everything here is baked today and kept warm at our <%= branch.name %>
+        <% if (branch.location) { %>shop (<%= branch.location %>)<% } %>.
+        Dimmed items are sold out until the next batch.
+      </p>
+      <% } %>
     </div>
     <main class="wrap">
       <div class="case">
         <div class="glass">
+          <% if (!locals.branch) { %>
+          <ul class="grid cities">
+            <% (locals.branches || []).forEach(function (entry) { %>
+            <li class="card">
+              <a href="/?branch=<%= entry.slug %>">
+                <h2><%= entry.name %></h2>
+                <% if (entry.location) { %>
+                <p class="hint"><%= entry.location %></p>
+                <% } %>
+              </a>
+            </li>
+            <% }) %>
+          </ul>
+          <% if (!(locals.branches || []).length) { %>
+          <p class="empty-shelf">No branches are open yet.</p>
+          <% } %>
+          <% } else { %>
           <% (locals.shelves || []).forEach(function (shelf) { %>
           <section class="shelf" aria-labelledby="<%= shelf.id %>">
             <h2 class="plate reveal" id="<%= shelf.id %>"><%= shelf.heading %></h2>
@@ -94,6 +128,7 @@
             <div class="rail"></div>
           </section>
           <% }) %>
+          <% } %>
         </div>
       </div>
       <div class="base" aria-hidden="true"></div>
@@ -104,5 +139,15 @@
     </footer>
 
     <script src="/js/script.js" defer></script>
+    <script>
+      (function () {
+        var picker = document.getElementById('city-switch');
+        if (picker) {
+          picker.addEventListener('change', function () {
+            window.location.href = '/?branch=' + picker.value;
+          });
+        }
+      })();
+    </script>
   </body>
 </html>

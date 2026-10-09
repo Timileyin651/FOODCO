@@ -10,7 +10,7 @@
           <h1 class="plate">
             <%= locals.item ? 'Edit ' + mod.singular.toLowerCase() : 'Add to ' + mod.heading %>
           </h1>
-          <a class="btn btn-small" href="/dashboard/<%= mod.path %>">
+          <a class="btn btn-small" href="/dashboard/<%= branch.slug %>/<%= mod.path %>">
             <svg class="ico" aria-hidden="true"><use href="#i-back"></use></svg>
             Back to <%= mod.heading.toLowerCase() %>
           </a>

@@ -142,6 +142,17 @@ footer{padding:28px 0 40px;text-align:center;color:var(--ink-dim);font-size:.9re
 /* Link into the staff dashboard */
 .bar-actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 .empty-shelf{margin:6px 0 10px;color:var(--ink-dim);font-size:.95rem}
+
+/* Branch picker cards + city switcher */
+.cities{grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr))}
+.cities .card a{display:block;text-decoration:none;color:var(--ink)}
+.cities .card h2{margin:2px 0 6px;font:700 1.25rem/1.2 var(--display)}
+.cities .card:hover{border-color:var(--amber)}
+.city-switch{
+  padding:9px 12px;border-radius:999px;font:600 .92rem/1 var(--body);
+  color:#0a1a11;background:var(--steel-1);border:2px solid var(--steel-2);cursor:pointer;
+}
+.city-switch:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
 .staff-link{
   display:inline-flex;align-items:center;padding:9px 18px;border-radius:999px;
   font:700 .92rem/1 var(--display);color:#2b1a05;text-decoration:none;

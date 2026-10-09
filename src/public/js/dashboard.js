@@ -4,6 +4,16 @@ document.querySelectorAll('form[data-confirm]').forEach((f) =>
   })
 );
 
+/* Branch switcher: jump to the same page in another branch. */
+(function () {
+  var switcher = document.getElementById('branch-switch');
+  if (!switcher) return;
+  switcher.addEventListener('change', function () {
+    var path = switcher.getAttribute('data-path') || '/dashboard';
+    window.location.href = path.replace('__branch__', switcher.value);
+  });
+})();
+
 /* Live preview for the image dropdown on the shared create/edit form. */
 (function () {
   var select = document.getElementById('f-image');

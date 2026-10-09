@@ -52,7 +52,10 @@ async function login(req, res, next) {
       });
     }
 
-    const user = await User.findOne({ email: value.email });
+    const user = await User.findOne({ email: value.email }).populate(
+      'branches',
+      'name slug',
+    );
     const passwordOk = user ? await user.isValidPassword(value.password) : false;
 
     if (!user || !passwordOk) {
@@ -73,6 +76,14 @@ async function login(req, res, next) {
         name,
         email: user.email,
         role: user.role || 'admin',
+        // superadmin keeps an empty list = access to every branch
+        branches:
+          user.role === 'superadmin'
+            ? []
+            : (user.branches || []).map((entry) => ({
+                slug: entry.slug,
+                name: entry.name,
+              })),
       };
       await audit.record({
         user: user._id,
@@ -80,7 +91,7 @@ async function login(req, res, next) {
         module: 'auth',
         summary: `${name} logged in`,
       });
-      res.redirect(LOGIN_PATH);
+      res.redirect('/dashboard');
     });
   } catch (err) {
     next(err);

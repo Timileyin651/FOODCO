@@ -8,19 +8,19 @@
     <div class="case">
       <div class="glass">
         <div class="panel-head">
-          <h1 class="plate">Overview</h1>
+          <h1 class="plate"><%= locals.branch ? branch.name : 'Overview' %></h1>
         </div>
 
         <%- include('../partials/flash') %>
 
         <p class="lede">
-          Welcome back<%= locals.user ? ', ' + user.name : '' %>. Pick a
-          section on the left to manage what is in the case.
+          Welcome back<%= locals.user ? ', ' + user.name : '' %>.<%= locals.branch ? ' Managing the ' + branch.name + ' case' : '' %>. Pick a
+          section on the left to manage what is on the shelves.
         </p>
 
         <ul class="grid stats">
           <li class="card">
-            <a href="/dashboard/bakery">
+            <a href="/dashboard/<%= branch.slug %>/bakery">
               <svg class="ico big" aria-hidden="true"><use href="#i-loaf"></use></svg>
               <h2>Bakery</h2>
               <p class="count"><%= locals.counts ? counts.bakery : 0 %></p>
@@ -28,7 +28,7 @@
             </a>
           </li>
           <li class="card">
-            <a href="/dashboard/pastries">
+            <a href="/dashboard/<%= branch.slug %>/pastries">
               <svg class="ico big" aria-hidden="true"><use href="#i-pastry"></use></svg>
               <h2>Pastries</h2>
               <p class="count"><%= locals.counts ? counts.pastries : 0 %></p>
@@ -36,7 +36,7 @@
             </a>
           </li>
           <li class="card">
-            <a href="/dashboard/snacks">
+            <a href="/dashboard/<%= branch.slug %>/snacks">
               <svg class="ico big" aria-hidden="true"><use href="#i-snack"></use></svg>
               <h2>Snacks</h2>
               <p class="count"><%= locals.counts ? counts.snacks : 0 %></p>
@@ -44,7 +44,7 @@
             </a>
           </li>
           <li class="card">
-            <a href="/dashboard/audit">
+            <a href="/dashboard/<%= branch.slug %>/audit">
               <svg class="ico big" aria-hidden="true"><use href="#i-clipboard"></use></svg>
               <h2>Audit</h2>
               <p class="count">&mdash;</p>

@@ -1,10 +1,33 @@
-<% const navItems = [
-  { href: '/dashboard/bakery', label: 'Bakery', icon: 'i-loaf' },
-  { href: '/dashboard/pastries', label: 'Pastries', icon: 'i-pastry' },
-  { href: '/dashboard/snacks', label: 'Snacks', icon: 'i-snack' },
-  { href: '/dashboard/audit', label: 'Audit', icon: 'i-clipboard' },
-]; %>
+<%
+  var branchSlug = locals.branch ? branch.slug : '';
+  var navItems = [
+    { href: '/dashboard/' + branchSlug + '/bakery', label: 'Bakery', icon: 'i-loaf' },
+    { href: '/dashboard/' + branchSlug + '/pastries', label: 'Pastries', icon: 'i-pastry' },
+    { href: '/dashboard/' + branchSlug + '/snacks', label: 'Snacks', icon: 'i-snack' },
+    { href: '/dashboard/' + branchSlug + '/audit', label: 'Audit', icon: 'i-clipboard' },
+  ];
+  var switchPath = (locals.currentPath || '/dashboard').replace('/' + branchSlug, '/__branch__');
+%>
 <aside class="side">
+  <% if (locals.branches && branches.length > 1) { %>
+  <div class="branch-switch">
+    <label for="branch-switch">Branch</label>
+    <select id="branch-switch" data-path="<%= switchPath %>">
+      <% branches.forEach(function (entry) { %>
+      <option value="<%= entry.slug %>" <%= locals.branch && branch.slug === entry.slug ? 'selected' : '' %>>
+        <%= entry.name %>
+      </option>
+      <% }) %>
+    </select>
+  </div>
+  <% } else if (locals.branch) { %>
+  <p class="branch-label">
+    <span class="sr">Branch:</span>
+    <strong><%= branch.name %></strong>
+    <% if (branch.location) { %><span class="hint"><%= branch.location %></span><% } %>
+  </p>
+  <% } %>
+
   <nav aria-label="Dashboard sections">
     <ul class="nav">
       <% navItems.forEach(function (entry) { var isActive = locals.active === entry.href; %>

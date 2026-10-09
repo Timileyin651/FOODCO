@@ -8,7 +8,7 @@
       <div class="glass">
         <div class="panel-head">
           <h1 class="plate">Audit</h1>
-          <p class="count-note"><%= locals.total || 0 %> entries</p>
+          <p class="count-note"><%= locals.branch ? branch.name + ' · ' : '' %><%= locals.total || 0 %> entries</p>
         </div>
 
         <%- include('../../partials/flash') %>
@@ -47,11 +47,11 @@
         <% if (pages > 1) { %>
         <nav class="pager" aria-label="Pagination">
           <% if (current > 1) { %>
-          <a class="btn btn-small" href="/dashboard/audit?page=<%= current - 1 %>">Previous</a>
+          <a class="btn btn-small" href="/dashboard/<%= branch.slug %>/audit?page=<%= current - 1 %>">Previous</a>
           <% } %>
           <span>Page <%= current %> of <%= pages %></span>
           <% if (current < pages) { %>
-          <a class="btn btn-small" href="/dashboard/audit?page=<%= current + 1 %>">Next</a>
+          <a class="btn btn-small" href="/dashboard/<%= branch.slug %>/audit?page=<%= current + 1 %>">Next</a>
           <% } %>
         </nav>
         <% } %>

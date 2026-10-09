@@ -22,6 +22,12 @@ const auditLogSchema = new mongoose.Schema(
       default: 'auth',
       trim: true,
     },
+    branch: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Branch',
+      default: null,
+      index: true,
+    },
     targetId: {
       type: mongoose.Schema.Types.ObjectId,
       default: null,

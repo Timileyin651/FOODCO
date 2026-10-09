@@ -1,0 +1,34 @@
+<%- include('../partials/head', { title: 'Choose a branch' }) %>
+<%- include('../partials/header') %>
+
+<main class="wrap auth-main wide">
+  <div class="case">
+    <div class="glass">
+      <h1 class="plate">Choose a branch</h1>
+      <p class="lede">
+        Welcome back<%= locals.user ? ', ' + user.name : '' %>. Pick the
+        branch you want to manage.
+      </p>
+
+      <ul class="grid cities">
+        <% (locals.branches || []).forEach(function (entry) { %>
+        <li class="card">
+          <a href="/dashboard/<%= entry.slug %>">
+            <h2><%= entry.name %></h2>
+            <% if (entry.location) { %>
+            <p class="hint"><%= entry.location %></p>
+            <% } %>
+          </a>
+        </li>
+        <% }) %>
+      </ul>
+
+      <% if (!(locals.branches || []).length) { %>
+      <p class="empty">No branches are open yet. Run <code>npm run seed</code>.</p>
+      <% } %>
+    </div>
+  </div>
+  <div class="base" aria-hidden="true"></div>
+</main>
+
+<%- include('../partials/foot') %>

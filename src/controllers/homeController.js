@@ -1,5 +1,8 @@
+const { listActive, findBySlug } = require('../services/branch.service');
 const { getModule } = require('../config/modules');
 const items = require('../services/item.service');
+
+const BRANCH_COOKIE = 'foodco.branch';
 
 /* Warm shelf colours, one per card position (same palette as the original
    static storefront markup). */
@@ -30,32 +33,66 @@ const SHELVES = [
   { key: 'snacks', heading: 'Snacks', id: 'h-snacks' },
 ];
 
+function readCookie(req, name) {
+  const header = req.headers.cookie || '';
+  const match = new RegExp('(?:^|; )' + name + '=([^;]*)').exec(header);
+  return match ? decodeURIComponent(match[1]) : '';
+}
+
+async function buildShelves(branch) {
+  return Promise.all(
+    SHELVES.map(async (shelf) => {
+      const result = await items.listItems(getModule(shelf.key).model, {
+        page: 1,
+        branch: branch._id,
+      });
+      const shelfItems = result.items
+        .slice()
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      return { ...shelf, items: shelfItems, palettes: PALETTES[shelf.key] };
+    }),
+  );
+}
+
 /**
- * The storefront homepage. Shelves are rendered from the same collections the
- * admin edits, so adding, editing or marking something "Not available" in the
- * dashboard shows up here straight away.
+ * Storefront homepage. With no branch chosen it shows the picker
+ * (?branch=abuja or the foodco.branch cookie picks one); each branch sees
+ * only its own case, kept in sync with its dashboard.
  */
 async function index(req, res, next) {
   try {
-    const shelves = await Promise.all(
-      SHELVES.map(async (shelf) => {
-        const result = await items.listItems(getModule(shelf.key).model, {
-          page: 1,
-        });
-        const shelfItems = result.items
-          .slice()
-          .sort((a, b) => a.name.localeCompare(b.name));
+    const wanted = (
+      req.query.branch ||
+      readCookie(req, BRANCH_COOKIE) ||
+      ''
+    ).toLowerCase();
 
-        return {
-          ...shelf,
-          items: shelfItems,
-          palettes: PALETTES[shelf.key],
-        };
-      }),
-    );
+    const branches = await listActive();
+    const branch = wanted ? await findBySlug(wanted) : null;
+
+    if (!branch) {
+      return res.render('index', {
+        title: 'Fresh from the case',
+        branch: null,
+        branches,
+        shelves: [],
+      });
+    }
+
+    res.cookie(BRANCH_COOKIE, branch.slug, {
+      httpOnly: false,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 1000 * 60 * 60 * 24 * 90,
+    });
+
+    const shelves = await buildShelves(branch);
 
     return res.render('index', {
-      title: 'Fresh from the case',
+      title: `Fresh from the case | ${branch.name}`,
+      branch,
+      branches,
       shelves,
     });
   } catch (err) {
@@ -63,4 +100,4 @@ async function index(req, res, next) {
   }
 }
 
-module.exports = { index };
+module.exports = { index, BRANCH_COOKIE };

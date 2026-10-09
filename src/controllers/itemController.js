@@ -41,7 +41,8 @@ function formValues(body) {
 }
 
 function renderForm(req, res, { mod, values, errors = {}, formError = null, item = null }) {
-  const base = `/dashboard/${mod.path}`;
+  const branch = req.branch;
+  const base = `/dashboard/${branch.slug}/${mod.path}`;
   return res.render('admin/module/item-form', {
     title: item ? `Edit ${mod.singular.toLowerCase()}` : `Add to ${mod.heading}`,
     mod,
@@ -63,6 +64,7 @@ async function list(req, res, next) {
     const result = await items.listItems(mod.model, {
       q,
       page: req.query.page,
+      branch: req.branch._id,
     });
 
     return res.render(`admin/module/${mod.key}`, {
@@ -108,22 +110,26 @@ async function create(req, res, next) {
         errors: fieldErrors(error),
         formError: 'Please fix the fields below.',
         images: listImages(),
-        formAction: `/dashboard/${mod.path}/new`,
+        formAction: `/dashboard/${req.branch.slug}/${mod.path}/new`,
       });
     }
 
-    const created = await items.createItem(mod.model, value);
+    const created = await items.createItem(mod.model, {
+      ...value,
+      branch: req.branch._id,
+    });
 
     await audit.record({
       user: req.session.user,
       action: 'create',
       module: mod.key,
+      branch: req.branch._id,
       targetId: created._id,
       summary: `${mod.singular} added: ${created.name}`,
     });
 
     req.flash('success', `${mod.singular} added`);
-    return res.redirect(`/dashboard/${mod.path}`);
+    return res.redirect(`/dashboard/${req.branch.slug}/${mod.path}`);
   } catch (err) {
     return next(err);
   }
@@ -171,7 +177,7 @@ async function edit(req, res, next) {
         errors: fieldErrors(error),
         formError: 'Please fix the fields below.',
         images: listImages(),
-        formAction: `/dashboard/${mod.path}/${existing._id}/edit`,
+        formAction: `/dashboard/${req.branch.slug}/${mod.path}/${existing._id}/edit`,
       });
     }
 
@@ -181,12 +187,13 @@ async function edit(req, res, next) {
       user: req.session.user,
       action: 'update',
       module: mod.key,
+      branch: req.branch._id,
       targetId: updated._id,
       summary: `${mod.singular} updated: ${updated.name}`,
     });
 
     req.flash('success', `${mod.singular} updated`);
-    return res.redirect(`/dashboard/${mod.path}`);
+    return res.redirect(`/dashboard/${req.branch.slug}/${mod.path}`);
   } catch (err) {
     return next(err);
   }
@@ -204,12 +211,13 @@ async function remove(req, res, next) {
       user: req.session.user,
       action: 'delete',
       module: mod.key,
+      branch: req.branch._id,
       targetId: existing._id,
       summary: `${mod.singular} deleted: ${existing.name}`,
     });
 
     req.flash('success', `${mod.singular} deleted`);
-    return res.redirect(`/dashboard/${mod.path}`);
+    return res.redirect(`/dashboard/${req.branch.slug}/${mod.path}`);
   } catch (err) {
     return next(err);
   }
