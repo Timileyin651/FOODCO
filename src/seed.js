@@ -46,7 +46,10 @@ const BRANCHES = [
 const SAMPLES = {
   Bakery: [
     { name: ' Whole wheat loaf', price: 2500, quantity: 12, image: 'country-loaf.svg' },
-    { name: 'Whole wheat loaf', price: 2800, quantity: 8, image: 'whole-wheat-loaf.svg' },
+    { name: 'White sliced bread', price: 2800, quantity: 8, image: 'sliced-bread.svg' },
+    { name: 'Whole white loaf', price: 2800, quantity: 8, image: 'whole-wheat-loaf.svg' },
+    { name: 'Wheat sliced bread', price: 2800, quantity: 8, image: 'sliced-bread.svg' },
+
     // { name: 'Baguette', price: 1500, quantity: 0, image: 'baguette.svg' },
     // { name: 'Sesame bun', price: 800, quantity: 24, image: 'sesame-bun.svg' },
   ],
