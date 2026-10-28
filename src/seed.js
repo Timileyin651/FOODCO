@@ -45,16 +45,16 @@ const BRANCHES = [
 
 const SAMPLES = {
   Bakery: [
-    { name: 'Country loaf', price: 2500, quantity: 12, image: 'country-loaf.svg' },
+    { name: ' Whole wheat loaf', price: 2500, quantity: 12, image: 'country-loaf.svg' },
     { name: 'Whole wheat loaf', price: 2800, quantity: 8, image: 'whole-wheat-loaf.svg' },
-    { name: 'Baguette', price: 1500, quantity: 0, image: 'baguette.svg' },
-    { name: 'Sesame bun', price: 800, quantity: 24, image: 'sesame-bun.svg' },
+    // { name: 'Baguette', price: 1500, quantity: 0, image: 'baguette.svg' },
+    // { name: 'Sesame bun', price: 800, quantity: 24, image: 'sesame-bun.svg' },
   ],
   Pastries: [
-    { name: 'Butter croissant', price: 1200, quantity: 18, image: 'butter-croissant.svg' },
+    // { name: 'Butter croissant', price: 1200, quantity: 18, image: 'butter-croissant.svg' },
     { name: 'Glazed donut', price: 700, quantity: 0, image: 'glazed-donut.svg' },
-    { name: 'Blueberry muffin', price: 1000, quantity: 14, image: 'blueberry-muffin.svg' },
-    { name: 'Apricot danish', price: 1300, quantity: 9, image: 'apricot-danish.svg' },
+    // { name: 'Blueberry muffin', price: 1000, quantity: 14, image: 'blueberry-muffin.svg' },
+    // { name: 'Apricot danish', price: 1300, quantity: 9, image: 'apricot-danish.svg' },
     { name: 'Meat Pie', price: 1300, quantity: 22, image: 'meat-pie.svg' },
     { name: 'Spice Beef Pie', price: 1500, quantity: 14, image: 'spice-beef-pie.svg' },
     { name: 'Chicken Pie', price: 1600, quantity: 12, image: 'chicken-pie.svg' },
@@ -63,8 +63,8 @@ const SAMPLES = {
   Snacks: [
     { name: 'Sausage roll', price: 900, quantity: 20, image: 'sausage-roll.svg' },
     { name: 'Meat pie', price: 1100, quantity: 16, image: 'meat-pie.svg' },
-    { name: 'Samosa', price: 600, quantity: 0, image: 'samosa.svg' },
-    { name: 'Puff-puff', price: 500, quantity: 30, image: 'puff-puff.svg' },
+    // { name: 'Samosa', price: 600, quantity: 0, image: 'samosa.svg' },
+    // { name: 'Puff-puff', price: 500, quantity: 30, image: 'puff-puff.svg' },
     { name: 'Scotch Egg', price: 900, quantity: 20, image: 'scotch-egg.svg' },
     { name: 'Hot Dog', price: 1200, quantity: 18, image: 'hot-dog.svg' },
     { name: 'Buns', price: 700, quantity: 30, image: 'buns.svg' },
