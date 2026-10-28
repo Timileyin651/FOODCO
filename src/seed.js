@@ -1,13 +1,21 @@
 /**
  * Seed script: npm run seed
- *  - creates the 5 branches (Abuja, Lagos, Oyo, Benin, Sokoto)
- *  - creates a superadmin from ADMIN_EMAIL / ADMIN_PASSWORD (sees all branches)
- *  - creates one admin per branch: <slug>.admin@foodco.com with
- *    BRANCH_ADMIN_PASSWORD from .env (each can only open its own dashboard)
+ *  - replaces every old branch with the 11 Ibadan branches (Bodija, Idi-Ape,
+ *    Akobo, Jericho, Ring Road, Dugbe, Apata, Ologuneru, Monatan,
+ *    Akala Express, Adegbayi). Names are stored clean, without any "FoodCo"
+ *    prefix; the slug is the lowercase hyphenated name.
+ *  - clears whatever pointed at the removed branches (their stock, their
+ *    branch accounts, their audit rows) so nothing keeps a dangling reference
+ *  - creates a superadmin from ADMIN_EMAIL (sees all branches)
+ *  - creates one branch account per branch: username = the branch slug.
+ *    Every seeded account gets the same seed password (SEED_PASSWORD below),
+ *    hashed by the User model's bcrypt hook, and the username/email/password
+ *    rows are printed at the end of the run.
  *  - fills every branch with its own sample stock (image left empty where no
  *    product picture matches)
- *  - backfills any pre-branch data to the Lagos branch
- * Re-running is safe: everything is upserted.
+ * Re-running is safe: branches and stock are upserted, and every seeded
+ * account's password is (re)set to SEED_PASSWORD, so no seeded account can be
+ * left behind on an older password.
  */
 require('dotenv').config();
 const path = require('path');
@@ -22,11 +30,17 @@ const Snack = require('./models/snack');
 const AuditLog = require('./models/auditLog');
 
 const BRANCHES = [
-  { name: 'Abuja', slug: 'abuja', location: '12 Ademola Adetokunbo Crescent, Maitama, Abuja' },
-  { name: 'Lagos', slug: 'lagos', location: '14b Bourdillon Road, Ikoyi, Lagos' },
-  { name: 'Oyo', slug: 'oyo', location: 'Oluyole Estate, Ibadan, Oyo' },
-  { name: 'Benin', slug: 'benin', location: '18 Sapele Road, Benin City, Edo' },
-  { name: 'Sokoto', slug: 'sokoto', location: 'Kabala Crescent, Sokoto' },
+  { name: 'Bodija', slug: 'bodija', location: 'Opposite Aare Junction, Bodija/UI Road, Ibadan' },
+  { name: 'Idi-Ape', slug: 'idi-ape', location: 'Odua Shopping Complex, opposite Mary Hill Crescent School, Idi-Ape, Ibadan' },
+  { name: 'Akobo', slug: 'akobo', location: 'Baptist Bus Stop, near Police Post, Akobo, Ibadan' },
+  { name: 'Jericho', slug: 'jericho', location: '50 Jericho Street, by Jericho Nursing Home, All Saints Road, Jericho, Ibadan' },
+  { name: 'Ring Road', slug: 'ring-road', location: '117 MKO Abiola Way, beside IBEDC, Ring Road, Ibadan' },
+  { name: 'Dugbe', slug: 'dugbe', location: 'Inside Cocoa Mall, Dugbe, Ibadan' },
+  { name: 'Apata', slug: 'apata', location: 'UBL premises, by Lafia Hotel, Ibadan-Abeokuta Road, Apata' },
+  { name: 'Ologuneru', slug: 'ologuneru', location: 'Atinuke Bus Stop, New Eleyele Road, Ologuneru, Ibadan' },
+  { name: 'Monatan', slug: 'monatan', location: 'Monatan, Iwo Road, Ibadan' },
+  { name: 'Akala Express', slug: 'akala-express', location: 'Akala Express Road, Oluyole, Ibadan' },
+  { name: 'Adegbayi', slug: 'adegbayi', location: 'Adegbayi, Ibadan' },
 ];
 
 const SAMPLES = {
@@ -41,12 +55,19 @@ const SAMPLES = {
     { name: 'Glazed donut', price: 700, quantity: 0, image: 'glazed-donut.svg' },
     { name: 'Blueberry muffin', price: 1000, quantity: 14, image: 'blueberry-muffin.svg' },
     { name: 'Apricot danish', price: 1300, quantity: 9, image: 'apricot-danish.svg' },
+    { name: 'Meat Pie', price: 1300, quantity: 22, image: 'meat-pie.svg' },
+    { name: 'Spice Beef Pie', price: 1500, quantity: 14, image: 'spice-beef-pie.svg' },
+    { name: 'Chicken Pie', price: 1600, quantity: 12, image: 'chicken-pie.svg' },
+    { name: 'Sausage Roll', price: 1000, quantity: 24, image: 'sausage-roll.svg' },
   ],
   Snacks: [
     { name: 'Sausage roll', price: 900, quantity: 20, image: 'sausage-roll.svg' },
     { name: 'Meat pie', price: 1100, quantity: 16, image: 'meat-pie.svg' },
     { name: 'Samosa', price: 600, quantity: 0, image: 'samosa.svg' },
     { name: 'Puff-puff', price: 500, quantity: 30, image: 'puff-puff.svg' },
+    { name: 'Scotch Egg', price: 900, quantity: 20, image: 'scotch-egg.svg' },
+    { name: 'Hot Dog', price: 1200, quantity: 18, image: 'hot-dog.svg' },
+    { name: 'Buns', price: 700, quantity: 30, image: 'buns.svg' },
   ],
 };
 
@@ -54,16 +75,42 @@ const MODELS = { Bakery, Pastries: Pastry, Snacks: Snack };
 
 /* Each branch keeps its own stock numbers so the dashboards are clearly
    separate: different branches sell out of different things. */
-const STOCK_OFFSET = { abuja: 2, lagos: 0, oyo: -1, benin: 1, sokoto: -2 };
-
-function branchStock(base, branchSlug, index) {
-  const branchIndex = BRANCHES.findIndex((entry) => entry.slug === branchSlug);
-  const quantity = Math.max(0, base.quantity + (STOCK_OFFSET[branchSlug] || 0) * 3 + index);
+function branchStock(base, branchIndex, index) {
+  const offset = (branchIndex % 5) - 2;
+  const quantity = Math.max(0, base.quantity + offset * 3 + index);
   const soldOut = quantity === 0 || (index + branchIndex) % 4 === 0;
   return {
     quantity: soldOut ? 0 : quantity,
     status: soldOut ? 'out' : 'in',
   };
+}
+
+/* Single password for every account this script seeds. The database only ever
+   holds the bcrypt hash produced by the User model's pre-save hook. */
+const SEED_PASSWORD = 'foodco@1234';
+
+/** Delete every branch that is not one of the 11, and the records that
+ *  pointed at it (stock rows and audit rows). Account cleanup happens later,
+ *  once the surviving branch ids are known. */
+async function dropOldBranches() {
+  const keep = BRANCHES.map((entry) => entry.slug);
+  const old = await Branch.find({ slug: { $nin: keep } });
+  if (!old.length) return;
+
+  const oldIds = old.map((entry) => entry._id);
+  const [bakery, pastry, snack, audits] = await Promise.all([
+    Bakery.deleteMany({ branch: { $in: oldIds } }),
+    Pastry.deleteMany({ branch: { $in: oldIds } }),
+    Snack.deleteMany({ branch: { $in: oldIds } }),
+    AuditLog.deleteMany({ branch: { $in: oldIds } }),
+  ]);
+  await Branch.deleteMany({ _id: { $in: oldIds } });
+
+  console.log(
+    `Removed old branches: ${old.map((entry) => entry.name).join(', ')} ` +
+      `(${bakery.deletedCount + pastry.deletedCount + snack.deletedCount} stock rows, ` +
+      `${audits.deletedCount} audit rows)`,
+  );
 }
 
 async function ensureBranches() {
@@ -80,12 +127,32 @@ async function ensureBranches() {
   return bySlug;
 }
 
+/** Every non-superadmin account must belong to one of the 11 branches.
+ *  Anything left over (old branch admins, orphans) is dropped together with
+ *  its audit rows, so no session can reference a branch that is gone. */
+async function pruneStaleAccounts(bySlug) {
+  const valid = new Set(Object.values(bySlug).map(String));
+  const accounts = await User.find({ role: { $ne: 'superadmin' } });
+  const stale = accounts.filter((account) => {
+    const list = (account.branches || []).map(String);
+    return !list.length || !list.every((id) => valid.has(id));
+  });
+
+  if (stale.length) {
+    const ids = stale.map((account) => account._id);
+    await Promise.all([
+      User.deleteMany({ _id: { $in: ids } }),
+      AuditLog.deleteMany({ user: { $in: ids } }),
+    ]);
+    console.log(`Removed ${stale.length} account(s) tied to the old branches.`);
+  }
+}
+
 async function ensureSuperadmin() {
   const email = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
-  const password = process.env.ADMIN_PASSWORD || '';
 
-  if (!email || !password) {
-    console.warn('ADMIN_EMAIL / ADMIN_PASSWORD not set - no superadmin created.');
+  if (!email) {
+    console.warn('ADMIN_EMAIL not set - no superadmin created.');
     return;
   }
 
@@ -93,6 +160,7 @@ async function ensureSuperadmin() {
   if (existing) {
     existing.role = 'superadmin';
     existing.branches = [];
+    existing.password = SEED_PASSWORD; // re-hashed by the pre-save hook
     await existing.save();
     console.log(`Superadmin already exists: ${email}`);
   } else {
@@ -101,7 +169,7 @@ async function ensureSuperadmin() {
       last_name: 'Owner',
       username: 'owner',
       email,
-      password,
+      password: SEED_PASSWORD,
       role: 'superadmin',
       branches: [],
     });
@@ -109,51 +177,53 @@ async function ensureSuperadmin() {
   }
 }
 
-async function ensureBranchAdmins(bySlug) {
-  const shared = (process.env.BRANCH_ADMIN_PASSWORD || '').trim();
+/** One branch account per branch: username = lowercase hyphenated branch name.
+ *  The password is random, hashed by the model's bcrypt hook, and only kept in
+ *  memory long enough to be printed for this run. */
+async function ensureBranchAccounts(bySlug) {
+  const credentials = [];
 
   for (const branch of BRANCHES) {
-    const email = `${branch.slug}.admin@foodco.com`;
-    const password =
-      (process.env[`${branch.slug.toUpperCase()}_ADMIN_PASSWORD`] || '').trim() ||
-      shared;
+    const email = `${branch.slug}@foodco.com`;
+    const existing = await User.findOne({ email });
 
-    if (!password) {
-      console.warn(`No password for ${email} (set BRANCH_ADMIN_PASSWORD) - skipped.`);
+    if (existing) {
+      existing.username = branch.slug;
+      existing.first_name = branch.name;
+      existing.last_name = 'Admin';
+      existing.role = 'admin';
+      existing.branches = [bySlug[branch.slug]];
+      existing.password = SEED_PASSWORD; // re-hashed by the pre-save hook
+      await existing.save();
+      credentials.push({ username: branch.slug, email });
       continue;
     }
 
-    const existing = await User.findOne({ email });
-    if (existing) {
-      existing.role = 'admin';
-      existing.branches = [bySlug[branch.slug]];
-      await existing.save();
-      console.log(`Branch admin already exists: ${email} (${branch.name})`);
-    } else {
-      await User.create({
-        first_name: branch.name,
-        last_name: 'Admin',
-        username: `${branch.slug}admin`,
-        email,
-        password,
-        role: 'admin',
-        branches: [bySlug[branch.slug]],
-      });
-      console.log(`Branch admin created: ${email} (${branch.name})`);
-    }
+    await User.create({
+      first_name: branch.name,
+      last_name: 'Admin',
+      username: branch.slug,
+      email,
+      password: SEED_PASSWORD, // hashed by the pre-save hook
+      role: 'admin',
+      branches: [bySlug[branch.slug]],
+    });
+    credentials.push({ username: branch.slug, email });
   }
+
+  return credentials;
 }
 
 async function ensureStock(bySlug) {
-  const lagosId = bySlug.lagos;
+  const flagship = bySlug[BRANCHES[0].slug];
 
   for (const [label, entries] of Object.entries(SAMPLES)) {
     const model = MODELS[label];
     let created = 0;
 
-    for (const branch of BRANCHES) {
+    for (const [branchIndex, branch] of BRANCHES.entries()) {
       for (const [index, entry] of entries.entries()) {
-        const stock = branchStock(entry, branch.slug, index);
+        const stock = branchStock(entry, branchIndex, index);
         const result = await model.updateOne(
           { name: entry.name, branch: bySlug[branch.slug] },
           {
@@ -172,32 +242,21 @@ async function ensureStock(bySlug) {
     // Anything created before branches existed belongs to the flagship branch.
     await model.updateMany(
       { branch: { $exists: false } },
-      { $set: { branch: lagosId } },
+      { $set: { branch: flagship } },
     );
 
-    console.log(`${label}: ${created} rows across 5 branches (${BRANCHES.length * entries.length} total)`);
+    console.log(`${label}: ${created} rows across ${BRANCHES.length} branches (${BRANCHES.length * entries.length} total)`);
   }
 }
 
-async function backfillUsers(bySlug) {
-  const lagosId = bySlug.lagos;
-  const orphaned = await User.find({
-    role: { $ne: 'superadmin' },
-    $or: [{ branches: { $exists: false } }, { branches: { $size: 0 } }],
-  });
-
-  for (const user of orphaned) {
-    user.branches = [lagosId];
-    await user.save();
+function printCredentials(credentials) {
+  const pad = (value, size) => String(value).padEnd(size);
+  console.log('\nBranch credentials (every seeded account uses the same seed password):');
+  console.log(`  ${pad('username', 14)}${pad('login email', 28)}password`);
+  for (const entry of credentials) {
+    console.log(`  ${pad(entry.username, 14)}${pad(entry.email, 28)}${SEED_PASSWORD}`);
   }
-  if (orphaned.length) {
-    console.log(`Backfilled ${orphaned.length} user(s) to the Lagos branch.`);
-  }
-
-  await AuditLog.updateMany(
-    { branch: { $exists: false } },
-    { $set: { branch: lagosId } },
-  );
+  console.log('  Log in at /login with the login email and password.\n');
 }
 
 async function run() {
@@ -210,14 +269,16 @@ async function run() {
   await mongoose.connect(uri);
   console.log('Connected to MongoDB');
 
+  await dropOldBranches();
   const bySlug = await ensureBranches();
+  await pruneStaleAccounts(bySlug);
   await ensureSuperadmin();
-  await ensureBranchAdmins(bySlug);
+  const credentials = await ensureBranchAccounts(bySlug);
   await ensureStock(bySlug);
-  await backfillUsers(bySlug);
 
   await mongoose.disconnect();
   console.log('Seed complete.');
+  printCredentials(credentials);
 }
 
 run().catch((err) => {

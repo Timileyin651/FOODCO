@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 80" width="100" height="80" role="img" aria-label="Spice beef pie">
+  <path d="M50 12L86 66H14z" fill="#c98a4a"/>
+  <path d="M24 52h52l10 14H14z" fill="#8c4a2f"/>
+  <g fill="#e2452f">
+    <circle cx="36" cy="60" r="2.4"/>
+    <circle cx="50" cy="62" r="2.4"/>
+    <circle cx="64" cy="60" r="2.4"/>
+  </g>
+  <path d="M50 12L14 66M50 12l36 54" fill="none" stroke="#9d5d1b" stroke-width="3" stroke-linejoin="round"/>
+</svg>

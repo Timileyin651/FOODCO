@@ -24,7 +24,7 @@
     <header class="canopy">
       <div class="wrap bar">
         <a class="logo" href="#top" aria-label="FoodCo home"
-          ><img src="/images/foodco-logo.svg" alt="FoodCo" width="196" height="64"
+          ><img src="/images/products/foodco-logo.svg" alt="FoodCo" width="196" height="64"
         /></a>
         <div class="bar-actions">
           <ul class="legend" aria-label="Availability key">
@@ -50,8 +50,8 @@
       <% if (!locals.branch) { %>
       <h1>Where are you?</h1>
       <p>
-        FoodCo has five branches. Pick yours to see what is fresh in the case
-        today.
+        FoodCo has <%= (locals.branches || []).length %> branches. Pick yours to see
+        what is fresh in the case today.
       </p>
       <% } else { %>
       <h1><%= branch.name %></h1>
@@ -116,10 +116,19 @@
                   <% } %>
                 </div>
                 <h3><%= item.name %></h3>
-                <p class="status">
-                  <i class="dot<%= isOut ? ' out' : '' %>"></i>
-                  <%= isOut ? 'Not available' : 'Available' %>
-                </p>
+                <div class="card-foot">
+                  <p class="status">
+                    <i class="dot<%= isOut ? ' out' : '' %>"></i>
+                    <%= isOut ? 'Not available' : 'Available' %>
+                  </p>
+                  <% /* Stock pill: only when the item is available and has a
+                       usable quantity. Number() turns null/undefined/'' into
+                       0 or NaN, so broken rows simply show no pill. */ %>
+                  <% var stock = Number(item.quantity); var showStock = !isOut && isFinite(stock) && stock > 0; %>
+                  <% if (showStock) { %>
+                  <span class="stock-pill"><%= stock %> in stock</span>
+                  <% } %>
+                </div>
               </li>
               <% }) %>
             </ul>

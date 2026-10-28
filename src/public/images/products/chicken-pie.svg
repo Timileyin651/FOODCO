@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 80" width="100" height="80" role="img" aria-label="Chicken pie">
+  <path d="M8 62c0-25 19-42 42-42s42 17 42 42z" fill="#ecc787"/>
+  <g fill="none" stroke="#cfa45c" stroke-width="3" stroke-linecap="round">
+    <path d="M26 34l38 26"/>
+    <path d="M44 26l36 26"/>
+    <path d="M74 34L36 60"/>
+    <path d="M56 26L20 52"/>
+  </g>
+  <path d="M6 62h88" fill="none" stroke="#c69a4f" stroke-width="9" stroke-linecap="round" stroke-dasharray="4 5"/>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 80" width="100" height="80" role="img" aria-label="Hot dog">
+  <rect x="6" y="48" width="88" height="20" rx="10" fill="#e0a860"/>
+  <rect x="8" y="30" width="84" height="24" rx="12" fill="#c0553a"/>
+  <rect x="6" y="20" width="88" height="18" rx="9" fill="#e6b46c"/>
+  <path d="M18 46q7-6 14 0t14 0 14 0 14 0" fill="none" stroke="#ffd447" stroke-width="3.5" stroke-linecap="round"/>
+</svg>

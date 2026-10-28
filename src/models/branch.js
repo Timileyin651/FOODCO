@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 /**
- * A branch of the restaurant: Abuja, Lagos, Oyo, Benin, Sokoto... Items and
+ * A FoodCo shop: Bodija, Idi-Ape, Ring Road... (11 Ibadan branches). Items and
  * audit entries belong to one branch, and each branch has its own dashboard.
  */
 const branchSchema = new mongoose.Schema(

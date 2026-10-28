@@ -57,7 +57,7 @@ async function buildShelves(branch) {
 
 /**
  * Storefront homepage. With no branch chosen it shows the picker
- * (?branch=abuja or the foodco.branch cookie picks one); each branch sees
+ * (?branch=bodija or the foodco.branch cookie picks one); each branch sees
  * only its own case, kept in sync with its dashboard.
  */
 async function index(req, res, next) {
